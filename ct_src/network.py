@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
-
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len=512, dropout=0.1):
         super(PositionalEncoding, self).__init__()
@@ -16,7 +15,7 @@ class PositionalEncoding(nn.Module):
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         pe = pe.unsqueeze(0)  # [1, max_len, d_model]
-        self.register_buffer('pe', pe)
+        self.register_buffer('pe', pe)# 不需要反向传播
 
     def forward(self, x):
         # x: [batch, seq_len, d_model]
@@ -25,7 +24,6 @@ class PositionalEncoding(nn.Module):
 
 
 class ResidualBlock(nn.Module):
-    # ... (保持原有的 ResidualBlock 代码不变，为了节省篇幅这里省略，请务必保留) ...
     def __init__(self, in_channels, out_channels, kernel_size=3, padding=1, dropout=0.2):
         super(ResidualBlock, self).__init__()
         self.conv1 = nn.Conv1d(in_channels, out_channels, kernel_size, padding=padding)
@@ -58,11 +56,13 @@ class ResidualBlock(nn.Module):
 
 
 class ParallelResNetTransformer(nn.Module):
+    """
+    CT-Net: A Dual-Branch Network with Physicochemical Gating
+    """
     def __init__(self, vocab_size, embed_dim, phys_dim, hidden_size, output_dim, embedding_matrix=None):
-        # 确保传入的 phys_dim 是 8 (将在 train.py 传入)
         super(ParallelResNetTransformer, self).__init__()
 
-        # 1. Embedding
+        # 1. Semantic Embedding
         self.embedding = nn.Embedding(vocab_size, embed_dim)
         if embedding_matrix is not None:
             self.embedding.weight = nn.Parameter(torch.tensor(embedding_matrix, dtype=torch.float32))
@@ -70,35 +70,33 @@ class ParallelResNetTransformer(nn.Module):
 
         self.embed_dropout = nn.Dropout(0.2)
 
-        # 注意：这里的 phys_dim 必须与 data_utils 输出一致
-        self.phys_proj = nn.Sequential(
-            nn.Linear(phys_dim, hidden_size),
-            nn.LayerNorm(hidden_size),  # 将 BatchNorm1d 换成 LayerNorm
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(hidden_size, hidden_size),
-            nn.LayerNorm(hidden_size)  # 统一使用 LayerNorm
-        )
-        self.fusion_gate = nn.Linear(hidden_size * 2, hidden_size)
+        # 2. Physicochemical Feature Extraction & Gating Projector
         self.phys_ext = nn.Sequential(
             nn.Linear(phys_dim, phys_dim * 2),
             nn.ReLU(),
             nn.Linear(phys_dim * 2, phys_dim)
         )
 
-        # CNN 分支的输入维度：embed_dim (语义) + phys_dim (理化)
-        self.input_dim = embed_dim + phys_dim
+        # 门控投影：将理化特征映射到与语义 Embedding 相同的维度 (embed_dim)
+        self.phys_proj = nn.Sequential(
+            nn.Linear(phys_dim, hidden_size),
+            nn.LayerNorm(hidden_size),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.Linear(hidden_size, embed_dim),  # 修复维度隐患，确保输出为 embed_dim
+            nn.LayerNorm(embed_dim)
+        )
 
-        # === Branch 1: Residual CNN (Local) ===
+        # === Branch 1: Residual CNN (Local Motifs) ===
+        self.input_dim = embed_dim + phys_dim
         self.res_cnn = nn.Sequential(
             ResidualBlock(self.input_dim, hidden_size),
             ResidualBlock(hidden_size, hidden_size)
         )
         self.cnn_dropout = nn.Dropout(0.3)
 
-        # === Branch 2: Transformer (Global) ===
-        self.trans_dim = 128
-        # 注意：这里直接使用交互后的 embed_dim (128)，不再需要 trans_proj
+        # === Branch 2: Transformer (Global Dependencies) ===
+        self.trans_dim = embed_dim  # 消除硬编码 128
         self.pos_encoder = PositionalEncoding(self.trans_dim, dropout=0.1)
 
         encoder_layer = nn.TransformerEncoderLayer(
@@ -110,37 +108,36 @@ class ParallelResNetTransformer(nn.Module):
         )
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
-        # === Fusion ===
+        # === Fusion & Classification ===
         self.fusion_dim = hidden_size + self.trans_dim
         self.fc1 = nn.Linear(self.fusion_dim, 64)
         self.fc_dropout = nn.Dropout(0.4)
         self.fc2 = nn.Linear(64, output_dim)
 
     def forward(self, x_idx, x_phys):
-        # 先对理化特征进行非线性增强
+        # 1. 特征增强 (Feature Enhancement)
         x_phys_enhanced = self.phys_ext(x_phys)
 
         emb = self.embedding(x_idx)
         emb = self.embed_dropout(emb)
 
-        # 使用增强后的理化特征生成门控权重
+        # 2. 理化门控融合 (Physicochemical Gating Interaction)
         phys_gate = torch.sigmoid(self.phys_proj(x_phys_enhanced))
         x_interact = emb * (1 + phys_gate)
 
-        # 拼接时也使用增强后的特征
+        # 3. Branch 1: CNN (提取局部特征)
         x_cnn_input = torch.cat([x_interact, x_phys_enhanced], dim=2)
         x_cnn = x_cnn_input.permute(0, 2, 1)
         c = self.res_cnn(x_cnn)
         c = self.cnn_dropout(c)
         c_out = F.max_pool1d(c, kernel_size=c.size(2)).squeeze(2)
 
-        # === Branch 2: Transformer ===
-        # 直接传入 128 维的交互特征
+        # 4. Branch 2: Transformer (提取全局依赖)
         t = self.pos_encoder(x_interact)
         t_out = self.transformer(t)
         t_out = t_out.mean(dim=1)
 
-        # === Fusion ===
+        # 5. 特征级拼接与分类 (Feature Fusion)
         fusion = torch.cat([c_out, t_out], dim=1)
         out = F.relu(self.fc1(fusion))
         out = self.fc_dropout(out)

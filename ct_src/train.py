@@ -6,7 +6,6 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, roc_auc_score, precision_recall_curve
 import numpy as np
 import os
-import pandas as pd
 import joblib
 from torch.utils.data import WeightedRandomSampler
 
@@ -61,27 +60,10 @@ def train():
     if not os.path.exists("models"):
         os.makedirs("models")
 
-    print(">>> 1. 读取数据并加载错误清单...")
+    print(">>> 1. 读取数据...")
     seqs, labels = read_fasta(config.DATA_PATH)
     labels = np.array(labels)
     seqs_arr = np.array(seqs)
-
-    # 加载 1086 条难样本清单
-    try:
-        error_df = pd.read_csv("error_samples_list.csv")
-        hard_seqs = error_df[error_df['status'] == 'FN (Missed AIP)']['sequence'].tolist()
-        print(f">>> 已加载 {len(hard_seqs)} 个难样本进行定向增强训练。")
-    except:
-        hard_seqs = []
-        print(">>> 未发现错误清单，执行标准训练。")
-
-    try:
-        error_df = pd.read_csv("error_samples_list.csv")
-        hard_seqs = error_df[error_df['status'] == 'FN (Missed AIP)']['sequence'].tolist()
-        print(f">>> 已加载 {len(hard_seqs)} 个难样本。")
-    except:
-        error_df = None  # 【关键：读取失败设为 None】
-        hard_seqs = []
 
     print(">>> 2. 准备 BioVec Embeddings...")
     w2v_model = train_biovec(seqs)
@@ -117,13 +99,14 @@ def train():
             padding_idx,
             global_max_len,
             config.K_MER,
-            config.USE_AUGMENTATION,
-            hard_seqs,
-            error_df=error_df  # 【关键：在这里显式传递 error_df】
+            config.USE_AUGMENTATION
         )
         val_ds = AIPDataset(X_val.tolist(), y_val, vocab, padding_idx, global_max_len, config.K_MER, False)
 
-        sampler = WeightedRandomSampler(weights=train_ds.weights, num_samples=len(train_ds), replacement=True)
+        # 【修复的 Sampler 逻辑】：保留正负样本权重，并正确包装为 PyTorch Sampler 对象
+        sample_weights = [2.0 if label == 1 else 1.0 for label in y_train]
+        sampler = WeightedRandomSampler(weights=sample_weights, num_samples=len(train_ds), replacement=True)
+
         train_loader = DataLoader(train_ds, batch_size=config.BATCH_SIZE, sampler=sampler)
         val_loader = DataLoader(val_ds, batch_size=config.BATCH_SIZE, shuffle=False)
 
@@ -188,33 +171,8 @@ def train():
                 print(
                     f"Fold {fold + 1} Epoch {epoch + 1} | ACC: {curr_acc:.4f} (Best: {best_acc:.4f}) | AUC: {curr_auc:.4f}")
 
-        # --- 该折主训练结束，加载巅峰权重进行微调 ---
+        # --- 该折主训练结束，加载巅峰权重 ---
         model.load_state_dict(torch.load(best_model_path))
-
-        if len(hard_seqs) > 0:
-            print(f">>> 对 Fold {fold + 1} 的难样本进行 3 轮冲刺微调...")
-            model.train()
-            fine_tune_optimizer = optim.AdamW(model.parameters(), lr=config.LEARNING_RATE * 0.01)
-            for _ in range(3):
-                for X_batch, X_phys, y_batch in train_loader:
-                    X_batch, X_phys, y_batch = X_batch.to(config.DEVICE), X_phys.to(config.DEVICE), y_batch.to(
-                        config.DEVICE)
-                    fine_tune_optimizer.zero_grad()
-                    loss = criterion(model(X_batch, X_phys).squeeze(), y_batch.float())
-                    loss.backward()
-                    fine_tune_optimizer.step()
-            # 微调后重新获取最佳阈值
-            model.eval()
-            with torch.no_grad():
-                ft_probs = []
-                for X_batch, X_phys, _ in val_loader:
-                    X_batch, X_phys = X_batch.to(config.DEVICE), X_phys.to(config.DEVICE)
-                    p = torch.sigmoid(model(X_batch, X_phys)).squeeze()
-                    if p.dim() == 0: p = p.unsqueeze(0)
-                    ft_probs.extend(p.cpu().numpy())
-                p, r, t = precision_recall_curve(y_val, ft_probs)
-                f1 = 2 * p * r / (p + r + 1e-10)
-                best_thr_at_peak = t[np.argmax(f1)]
 
         # 记录每折最终成果
         fold_best_thresholds[fold] = best_thr_at_peak

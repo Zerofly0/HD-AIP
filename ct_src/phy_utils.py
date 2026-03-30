@@ -38,13 +38,11 @@ def get_phys_features(seq, max_len=None):
     for aa in seq:
         feats.append(AA_PROPS.get(aa, AA_PROPS['X']))
 
-    # 转换为 Numpy
     feats = np.array(feats, dtype=np.float32)
 
-    # 标准化 (Z-score normalization)
-    # 这是一个关键 Trick：物理属性量纲差异很大（如分子量100+，电荷仅1），必须标准化！
+    # 特征缩放Scaling
     # 这里简单除以大致的最大值做归一化，避免除零
-    # 疏水性/10, 分子量/200, 等电点/12
+    # 疏水性/5, 分子量/200, 等电点/12
     norm_scale = np.array([5.0, 5.0, 200.0, 12.0, 1.0, 1.0, 1.0])
     feats = feats / norm_scale
 

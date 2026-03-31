@@ -119,7 +119,7 @@ def train():
 
         best_acc, best_auc = 0.0, 0.0
         best_thr_at_peak = 0.5
-        best_model_path = f"models/wo_cnn_best_model_fold_{fold + 1}.pth"
+        best_model_path = f"models/wo_trans_best_model_fold_{fold + 1}.pth"
 
         for epoch in range(config.NUM_EPOCHS):
             model.train()
@@ -212,7 +212,7 @@ def train():
         'thresholds': fold_best_thresholds
     }, "models/train_assets.joblib")
 
-    np.savez("preds_wo_cnn_AIP.npz", probs=oof_preds, labels=labels)
+    np.savez("preds_wo_trans_AIP.npz", probs=oof_preds, labels=labels)
 
 
 if __name__ == "__main__":

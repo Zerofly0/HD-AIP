@@ -70,22 +70,12 @@ class ParallelResNetTransformer(nn.Module):
 
         self.embed_dropout = nn.Dropout(0.2)
 
-        # 2. Physicochemical Feature Extraction & Gating Projector(MLP)
+        # 2. Physicochemical Feature Extraction (MLP)
         self.phys_ext = nn.Sequential(
             nn.Linear(phys_dim, phys_dim * 2),
             nn.ReLU(),
             nn.Linear(phys_dim * 2, phys_dim)
         )
-
-        # # 门控投影：将理化特征映射到与语义 Embedding 相同的维度 (embed_dim)
-        # self.phys_proj = nn.Sequential(
-        #     nn.Linear(phys_dim, hidden_size),
-        #     nn.LayerNorm(hidden_size),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.1),
-        #     nn.Linear(hidden_size, embed_dim),  # 修复维度隐患，确保输出为 embed_dim
-        #     nn.LayerNorm(embed_dim)
-        # )
 
         # === Branch 1: Residual CNN (Local Motifs) ===
         self.input_dim = embed_dim + phys_dim
@@ -120,29 +110,21 @@ class ParallelResNetTransformer(nn.Module):
 
         emb = self.embedding(x_idx)
         emb = self.embed_dropout(emb)
-
-        # # 2. 理化门控融合 (Physicochemical Gating Interaction)
-        # phys_gate = torch.sigmoid(self.phys_proj(x_phys_enhanced))
-        # x_interact = emb * (1 + phys_gate)
-
-        # 2. 【核心修改：移除门控乘法运算】
-        # 取消 phys_gate = torch.sigmoid(...)
-        # 直接将未经理化干预的语义特征 emb 作为主交互变量
         x_interact = emb
 
-        # 3. Branch 1: CNN (提取局部特征)
+        # 2. Branch 1: CNN (提取局部特征)
         x_cnn_input = torch.cat([x_interact, x_phys_enhanced], dim=2)
         x_cnn = x_cnn_input.permute(0, 2, 1)
         c = self.res_cnn(x_cnn)
         c = self.cnn_dropout(c)
         c_out = F.max_pool1d(c, kernel_size=c.size(2)).squeeze(2)
 
-        # 4. Branch 2: Transformer (提取全局依赖)
+        # 3. Branch 2: Transformer (提取全局依赖)
         t = self.pos_encoder(x_interact)
         t_out = self.transformer(t)
         t_out = t_out.mean(dim=1)
 
-        # 5. 特征级拼接与分类 (Feature Fusion)
+        # 4. 特征级拼接与分类 (Feature Fusion)
         fusion = torch.cat([c_out, t_out], dim=1)
         out = F.relu(self.fc1(fusion))
         out = self.fc_dropout(out)

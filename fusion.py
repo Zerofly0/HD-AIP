@@ -11,7 +11,7 @@ def main():
     # 1. 加载两个模型的预测结果
     try:
         data_old = np.load("dual_tower_src/preds_old_model_AIP.npz")
-        data_new = np.load("ct_src/preds_new_ctnet_AIP.npz")
+        data_new = np.load("ct_src/preds_wo_gate_AIP.npz")
 
         p1 = data_old["probs"]  # 旧模型 (PLM + Machine Learning)
         y = data_old["labels"]  # 真实标签

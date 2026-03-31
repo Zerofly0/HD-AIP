@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ct_src/network.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/network.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ct_src/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fusion.py" beforeDir="false" afterPath="$PROJECT_DIR$/fusion.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -9,9 +9,7 @@ import config
 # ESM-2 3B 版本 (结构预测 SOTA)
 MODEL_NAME = "facebook/esm2_t36_3B_UR50D"
 CACHE_FILE = os.path.join(config.CACHE_DIR, "esm2_3b_features_AIP.npz")
-BATCH_SIZE = 1  # 3B 模型很大，显存小的必须设为 1
-
-
+BATCH_SIZE = 1
 # ==============================
 
 def main():
@@ -33,17 +31,18 @@ def main():
     print(f"[Info] 读取数据: {config.FASTA_PATH}")
     ids, seqs = [], []
     with open(config.FASTA_PATH, "r") as f:
-        curr_id = None
         for line in f:
+            line = line.strip()
+            if not line:
+                continue
             if line.startswith(">"):
-                curr_id = line[1:].strip()
-                ids.append(curr_id)
+                ids.append(line[1:])
                 seqs.append("")
             else:
-                seqs[-1] += line.strip()
+                seqs[-1] += line
 
     # 提取特征
-    print(">>> 开始提取 ESM-2 3B Embeddings (Mean + Max) <<<")
+    print(">>> 开始提取 ESM-2 3B Embeddings (Mean + Max), 总样本数: {len(seqs)}<<<")
     emb_list = []
 
     with torch.no_grad():
@@ -55,10 +54,8 @@ def main():
             outputs = model(**inputs)
 
             for j in range(len(batch_seqs)):
-                # 注意：ESM-2 的 0 号 token 是 <cls>，最后是 <eos>
-                # 我们取中间的序列部分
                 mask = inputs['attention_mask'][j]
-                seq_len = mask.sum() - 2  # 减去 cls 和 eos
+                seq_len = mask.sum().item() - 2  # ESM-2 的 0 号 token 是 <cls>，最后是 <eos>, 减去 cls 和 eos
 
                 # [SeqLen, 2560]
                 valid_tokens = outputs.last_hidden_state[j][1: 1 + seq_len]
@@ -75,6 +72,7 @@ def main():
     X_esm = np.array(emb_list)
     print(f"ESM-2 特征维度: {X_esm.shape}")
 
+    os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
     np.savez_compressed(CACHE_FILE, X=X_esm, ids=ids)
     print(f"✅ ESM-2 特征已保存: {CACHE_FILE}")
 

@@ -87,13 +87,13 @@ class ParallelResNetTransformer(nn.Module):
             nn.LayerNorm(embed_dim)
         )
 
-        # === Branch 1: Residual CNN (Local Motifs) ===
-        self.input_dim = embed_dim + phys_dim
-        self.res_cnn = nn.Sequential(
-            ResidualBlock(self.input_dim, hidden_size),
-            ResidualBlock(hidden_size, hidden_size)
-        )
-        self.cnn_dropout = nn.Dropout(0.3)
+        # # === Branch 1: Residual CNN (Local Motifs) ===
+        # self.input_dim = embed_dim + phys_dim
+        # self.res_cnn = nn.Sequential(
+        #     ResidualBlock(self.input_dim, hidden_size),
+        #     ResidualBlock(hidden_size, hidden_size)
+        # )
+        # self.cnn_dropout = nn.Dropout(0.3)
 
         # === Branch 2: Transformer (Global Dependencies) ===
         self.trans_dim = embed_dim  # 消除硬编码 128
@@ -108,8 +108,11 @@ class ParallelResNetTransformer(nn.Module):
         )
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=2)
 
-        # === Fusion & Classification ===
-        self.fusion_dim = hidden_size + self.trans_dim
+        # # === Fusion & Classification ===
+        # self.fusion_dim = hidden_size + self.trans_dim
+        # === Classification (仅使用 Transformer 的输出) ===
+        # 融合维度现在只剩下 Transformer 的输出维度
+        self.fusion_dim = self.trans_dim
         self.fc1 = nn.Linear(self.fusion_dim, 64)
         self.fc_dropout = nn.Dropout(0.4)
         self.fc2 = nn.Linear(64, output_dim)
@@ -125,21 +128,23 @@ class ParallelResNetTransformer(nn.Module):
         phys_gate = torch.sigmoid(self.phys_proj(x_phys_enhanced))
         x_interact = emb * (1 + phys_gate)
 
-        # 3. Branch 1: CNN (提取局部特征)
-        x_cnn_input = torch.cat([x_interact, x_phys_enhanced], dim=2)
-        x_cnn = x_cnn_input.permute(0, 2, 1)
-        c = self.res_cnn(x_cnn)
-        c = self.cnn_dropout(c)
-        c_out = F.max_pool1d(c, kernel_size=c.size(2)).squeeze(2)
+        # # 3. Branch 1: CNN (提取局部特征)
+        # x_cnn_input = torch.cat([x_interact, x_phys_enhanced], dim=2)
+        # x_cnn = x_cnn_input.permute(0, 2, 1)
+        # c = self.res_cnn(x_cnn)
+        # c = self.cnn_dropout(c)
+        # c_out = F.max_pool1d(c, kernel_size=c.size(2)).squeeze(2)
 
         # 4. Branch 2: Transformer (提取全局依赖)
         t = self.pos_encoder(x_interact)
         t_out = self.transformer(t)
         t_out = t_out.mean(dim=1)
 
-        # 5. 特征级拼接与分类 (Feature Fusion)
-        fusion = torch.cat([c_out, t_out], dim=1)
-        out = F.relu(self.fc1(fusion))
+        # # 5. 特征级拼接与分类 (Feature Fusion)
+        # fusion = torch.cat([c_out, t_out], dim=1)
+        # out = F.relu(self.fc1(fusion))
+        # 5. 分类 (直接使用 t_out)
+        out = F.relu(self.fc1(t_out))
         out = self.fc_dropout(out)
         logits = self.fc2(out)
 

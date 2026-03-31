@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="汇总有用文件并跑通&#10;结果为&#10;Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7532, AUC=0.8174&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7515, AUC=0.8110&#10;&gt;&gt;&gt;🏆 策略A：终极双维度融合结果:&#10;   权重分配: 0.52 * CT-Net + 0.48 * Old-Model&#10;   最佳融合阈值: 0.44&#10;   🔥 Final ACC: 0.7649&#10;   🔥 Final AUC: 0.8408&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10;🤖 Stacking LR 结果:&#10;   ACC: 0.7582&#10;   AUC: 0.8398">
+    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="对ct_src代码进行了整理&#10;该部分修改后所得该部分成绩：&#10;Avg ACC: 0.7635 (历史新高)&#10;Avg AUC: 0.8104">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ct_src/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/data_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ct_src/network.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/network.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ct_src/phy_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/phy_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ct_src/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -97,7 +95,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774686853324</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="对ct_src代码进行了整理&#10;该部分修改后所得该部分成绩：&#10;Avg ACC: 0.7635 (历史新高)&#10;Avg AUC: 0.8104">
+      <option name="closed" value="true" />
+      <created>1774894609531</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1774894609531</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -113,6 +119,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="汇总有用文件并跑通&#10;结果为&#10;Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7532, AUC=0.8174&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7515, AUC=0.8110&#10;&gt;&gt;&gt; 策略A：终极双维度融合结果:&#10;   权重分配: 0.52 * CT-Net + 0.48 * Old-Model&#10;   最佳融合阈值: 0.44&#10;    Final ACC: 0.7649&#10;    Final AUC: 0.8408&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10; Stacking LR 结果:&#10;   ACC: 0.7582&#10;   AUC: 0.8398" />
-    <option name="LAST_COMMIT_MESSAGE" value="汇总有用文件并跑通&#10;结果为&#10;Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7532, AUC=0.8174&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7515, AUC=0.8110&#10;&gt;&gt;&gt; 策略A：终极双维度融合结果:&#10;   权重分配: 0.52 * CT-Net + 0.48 * Old-Model&#10;   最佳融合阈值: 0.44&#10;    Final ACC: 0.7649&#10;    Final AUC: 0.8408&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10; Stacking LR 结果:&#10;   ACC: 0.7582&#10;   AUC: 0.8398" />
+    <MESSAGE value="对ct_src代码进行了整理&#10;该部分修改后所得该部分成绩：&#10;Avg ACC: 0.7635 (历史新高)&#10;Avg AUC: 0.8104" />
+    <option name="LAST_COMMIT_MESSAGE" value="对ct_src代码进行了整理&#10;该部分修改后所得该部分成绩：&#10;Avg ACC: 0.7635 (历史新高)&#10;Avg AUC: 0.8104" />
   </component>
 </project>

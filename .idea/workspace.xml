@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="消融实验：&#10;仅使用 Phys+CKSAAP 训练 LightGBM&#10;========================================&#10;🏆 Old-Model (Dual-Tower) 平均 ACC: 0.7482&#10;🏆 Old-Model (Dual-Tower) 平均 AUC: 0.8137&#10;========================================">
+    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="已完成内部消融实验&#10;(CT-AIP_env) F:\pycharm241023\pythonwork\CT-AIP&gt;python fusion.py      &#10;&gt;&gt;&gt; [终极集成] 启动 Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7592, AUC=0.8178, MCC=0.4905&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7554, AUC=0.8159, MCC=0.4852&#10;&#10;🏆 终极双维度融合结果:&#10;   权重分配: 0.59 * CT-Net + 0.41 * Old-Model&#10;   最佳融合阈值: 0.52&#10;   🔥 Final ACC: 0.7711&#10;   🔥 Final AUC: 0.8424&#10;   🔥 Final MCC: 0.5152&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10;🤖 Stacking LR 结果:&#10;   ACC: 0.7678&#10;   AUC: 0.8424&#10;   MCC: 0.5090&#10;&#10;✅ 集成成功！性能超越了单模型。">
+      <change afterPath="$PROJECT_DIR$/dual_tower_src/baseline_ml.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/fusion_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/dual_tower_src/fusion_train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fusion.py" beforeDir="false" afterPath="$PROJECT_DIR$/fusion.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +150,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775026452663</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="已完成内部消融实验&#10;(CT-AIP_env) F:\pycharm241023\pythonwork\CT-AIP&gt;python fusion.py      &#10;&gt;&gt;&gt; [终极集成] 启动 Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7592, AUC=0.8178, MCC=0.4905&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7554, AUC=0.8159, MCC=0.4852&#10;&#10;🏆 终极双维度融合结果:&#10;   权重分配: 0.59 * CT-Net + 0.41 * Old-Model&#10;   最佳融合阈值: 0.52&#10;   🔥 Final ACC: 0.7711&#10;   🔥 Final AUC: 0.8424&#10;   🔥 Final MCC: 0.5152&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10;🤖 Stacking LR 结果:&#10;   ACC: 0.7678&#10;   AUC: 0.8424&#10;   MCC: 0.5090&#10;&#10;✅ 集成成功！性能超越了单模型。">
+      <option name="closed" value="true" />
+      <created>1775029318528</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1775029318528</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -174,6 +181,7 @@
     <MESSAGE value="优化dual-tower代码（删除冗余部分）&#10;该部分结果：&#10; Old-Model (Dual-Tower) 平均 ACC: 0.7592&#10; Old-Model (Dual-Tower) 平均 AUC: 0.8186" />
     <MESSAGE value="消融实验：&#10;仅使用 ESM-2 3B 训练 LightGBM&#10;========================================&#10; Old-Model (Dual-Tower) 平均 ACC: 0.6924&#10; Old-Model (Dual-Tower) 平均 AUC: 0.7388&#10;========================================" />
     <MESSAGE value="消融实验：&#10;仅使用 Phys+CKSAAP 训练 LightGBM&#10;========================================&#10; Old-Model (Dual-Tower) 平均 ACC: 0.7482&#10; Old-Model (Dual-Tower) 平均 AUC: 0.8137&#10;========================================" />
-    <option name="LAST_COMMIT_MESSAGE" value="消融实验：&#10;仅使用 Phys+CKSAAP 训练 LightGBM&#10;========================================&#10; Old-Model (Dual-Tower) 平均 ACC: 0.7482&#10; Old-Model (Dual-Tower) 平均 AUC: 0.8137&#10;========================================" />
+    <MESSAGE value="已完成内部消融实验&#10;(CT-AIP_env) F:\pycharm241023\pythonwork\CT-AIP&gt;python fusion.py      &#10;&gt;&gt;&gt; [终极集成] 启动 Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7592, AUC=0.8178, MCC=0.4905&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7554, AUC=0.8159, MCC=0.4852&#10;&#10; 终极双维度融合结果:&#10;   权重分配: 0.59 * CT-Net + 0.41 * Old-Model&#10;   最佳融合阈值: 0.52&#10;    Final ACC: 0.7711&#10;    Final AUC: 0.8424&#10;    Final MCC: 0.5152&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10; Stacking LR 结果:&#10;   ACC: 0.7678&#10;   AUC: 0.8424&#10;   MCC: 0.5090&#10;&#10;✅ 集成成功！性能超越了单模型。" />
+    <option name="LAST_COMMIT_MESSAGE" value="已完成内部消融实验&#10;(CT-AIP_env) F:\pycharm241023\pythonwork\CT-AIP&gt;python fusion.py      &#10;&gt;&gt;&gt; [终极集成] 启动 Dual-Stream Ensemble...&#10;   样本数: 4194&#10;   [基准 1] Old Model (Dual-Tower): ACC=0.7592, AUC=0.8178, MCC=0.4905&#10;   [基准 2] New Model (CT-Net)    : ACC=0.7554, AUC=0.8159, MCC=0.4852&#10;&#10; 终极双维度融合结果:&#10;   权重分配: 0.59 * CT-Net + 0.41 * Old-Model&#10;   最佳融合阈值: 0.52&#10;    Final ACC: 0.7711&#10;    Final AUC: 0.8424&#10;    Final MCC: 0.5152&#10;&#10;&gt;&gt;&gt; 策略 B: Logistic Meta-Learner...&#10; Stacking LR 结果:&#10;   ACC: 0.7678&#10;   AUC: 0.8424&#10;   MCC: 0.5090&#10;&#10;✅ 集成成功！性能超越了单模型。" />
   </component>
 </project>

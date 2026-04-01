@@ -20,31 +20,23 @@ def main():
     X_base = data_base["X"]
     y = data_base["y"]
 
-    # 核心修改：精准截取后半部分 (传统 Phys + CKSAAP 特征)
-    # 因为 ProtT5 的 Mean + Max Pooling 刚好占了前 2048 维
-    X_handcraft = X_base[:, 2048:]
+    print(">>> [2/3] 加载大模型特征 (ESM-2 3B)...")
+    esm_file = os.path.join(config.CACHE_DIR, "esm2_3b_features_AIP.npz")
+    if not os.path.exists(esm_file):
+        print(f"❌ 错误：未找到 ESM-2 特征文件 {esm_file}，请先运行 extract_esm2_3b.py")
+        return
 
-    # print(">>> [2/3] 加载大模型特征 (ESM-2 3B)...")
-    # esm_file = os.path.join(config.CACHE_DIR, "esm2_3b_features_AIP.npz")
-    # if not os.path.exists(esm_file):
-    #     print(f"❌ 错误：未找到 ESM-2 特征文件 {esm_file}，请先运行 extract_esm2_3b.py")
-    #     return
-    #
-    # data_esm = np.load(esm_file, allow_pickle=True)
-    # X_esm = data_esm["X"]
-    #
-    # # 1. 优化: 简单校验样本数是否对齐，防止拼接错位
-    # if len(X_base) != len(X_esm):
-    #     print("❌ 错误: 基础特征与 ESM-2 特征样本数量不一致，请检查！")
-    #     return
+    data_esm = np.load(esm_file, allow_pickle=True)
+    X_esm = data_esm["X"]
 
-    # print(">>> [3/3] 执行特征级拼接 (Feature Concat)...")
-    # X_final = np.hstack([X_base, X_esm])
-    # print(f"   样本数: {len(y)}, 原始拼接总维度: {X_final.shape[1]}")
+    # 1. 优化: 简单校验样本数是否对齐，防止拼接错位
+    if len(X_base) != len(X_esm):
+        print("❌ 错误: 基础特征与 ESM-2 特征样本数量不一致，请检查！")
+        return
 
-    # 废弃所有的大模型 (PLM) 特征
-    X_final = X_handcraft
-    print(f"   样本数: {len(y)}, 纯传统手工特征维度: {X_final.shape[1]}")
+    print(">>> [3/3] 执行特征级拼接 (Feature Concat)...")
+    X_final = np.hstack([X_base, X_esm])
+    print(f"   样本数: {len(y)}, 原始拼接总维度: {X_final.shape[1]}")
 
     # --- 特征筛选 ---
     print(">>> 正在基于 LightGBM 筛选 Top 300 核心特征...")
@@ -95,7 +87,7 @@ def main():
     print("=" * 40)
 
     # 4. 优化: 结果原样保存，保证上层 fusion.py 能够无缝读取
-    save_path = "preds_only_handcraft_AIP.npz"
+    save_path = "preds_old_model_AIP.npz"
     np.savez(save_path, probs=oof_probs, labels=y)
     print(f"🚀 集成数据已保存至: {save_path}")
 

@@ -57,7 +57,7 @@ class ResidualBlock(nn.Module):
 
 class ParallelResNetTransformer(nn.Module):
     """
-    CT-Net: A Dual-Branch Network with Physicochemical Gating
+    CT-Net: A Dual-Branch Network
     """
     def __init__(self, vocab_size, embed_dim, phys_dim, hidden_size, output_dim, embedding_matrix=None):
         super(ParallelResNetTransformer, self).__init__()

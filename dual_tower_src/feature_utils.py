@@ -99,38 +99,6 @@ def get_cksaap_features(seq, gap):
     total = length - gap - 1
     return np.array([pair_dict[p] / total for p in AA_PAIRS])
 
-def get_ctd_features(seq):
-    """计算 CTD 特征 (63维: 3种性质 * (3 C + 1 T + 15 D))"""
-    clean_seq = clean_sequence(seq)
-    N = len(clean_seq)
-    if N == 0: return np.zeros(57)  # 3 * (3 + 1 + 15) = 57 dims
-
-    ctd_vector = []
-    for group_map in CTD_PROPERTIES:
-        coded = [group_map.get(aa, 2) for aa in clean_seq]
-
-        # --- Composition (C) ---
-        c = [coded.count(g) / N for g in [1, 2, 3]]
-        ctd_vector.extend(c)
-
-        # --- Transition (T) ---
-        t = sum(1 for i in range(N - 1) if coded[i] != coded[i + 1]) if N > 1 else 0
-        ctd_vector.append(t / (N - 1) if N > 1 else 0.0)
-
-        # --- Distribution (D) ---
-        for g in [1, 2, 3]:
-            indices = [i for i, x in enumerate(coded) if x == g]
-            if not indices:
-                ctd_vector.extend([0.0] * 5)
-            else:
-                d = []
-                for p in [0, 25, 50, 75, 100]:
-                    k = min(int(len(indices) * p / 100), len(indices) - 1)
-                    d.append((indices[k] + 1) / N)
-                ctd_vector.extend(d)
-
-    return np.array(ctd_vector)
-
 def get_feature_names():
     """生成所有特征名字"""
     # 1. Embedding (2048维)

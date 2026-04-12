@@ -19,9 +19,6 @@ BATCH_SIZE = 4
 RANDOM_SEED = 2026
 N_FOLDS = 5
 
-# === Optuna 优化的最佳参数 ===
-TOP_K_FEATURES = 210  # Optuna 建议保留 210 个特征
-
 LGBM_PARAMS = {
     'n_estimators': 754,
     'learning_rate': 0.015841742665909857,

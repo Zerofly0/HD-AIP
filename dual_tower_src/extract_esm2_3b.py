@@ -24,7 +24,7 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = model.to(device)
     if device == "cuda":
-        model = model.half()  # 开启 FP16 节省显存
+        model = model.half()
     model.eval()
 
     # 读取数据
@@ -74,7 +74,7 @@ def main():
 
     os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
     np.savez_compressed(CACHE_FILE, X=X_esm, ids=ids)
-    print(f"✅ ESM-2 特征已保存: {CACHE_FILE}")
+    print(f"√ ESM-2 特征已保存: {CACHE_FILE}")
 
 
 if __name__ == "__main__":

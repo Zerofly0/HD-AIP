@@ -10,8 +10,8 @@ def main():
 
     # 1. 加载两个模型的预测结果
     try:
-        data_old = np.load("dual_tower_src/preds_old_model_AIP.npz")
-        data_new = np.load("ct_src/preds_wo_gate_AIP.npz")
+        data_old = np.load("dual_tower_src/preds_dual_tower_AIP.npz")
+        data_new = np.load("ct_src/preds_ct_net_AIP.npz")
 
         p1 = data_old["probs"]  # 旧模型 (PLM + Machine Learning)
         y = data_old["labels"]  # 真实标签
@@ -59,12 +59,12 @@ def main():
                 best_auc = roc_auc_score(y, p_ensemble)
                 best_mcc = matthews_corrcoef(y, p_ensemble > t)
 
-    print(f"🏆 终极双维度融合结果:")
+    print(f"\n>>>策略 A： 动态软集成...")
     print(f"   权重分配: {best_w:.2f} * CT-Net + {1 - best_w:.2f} * Old-Model")
     print(f"   最佳融合阈值: {best_t:.2f}")
-    print(f"   🔥 Final ACC: {best_acc:.4f}")
-    print(f"   🔥 Final AUC: {best_auc:.4f}")
-    print(f"   🔥 Final MCC: {best_mcc:.4f}")
+    print(f"   ACC: {best_acc:.4f}")
+    print(f"   AUC: {best_auc:.4f}")
+    print(f"   MCC: {best_mcc:.4f}")
 
     # 4. 策略 B: Stacking (Logistic Regression)
     # 如果两者差异很大，LR 可能会学到更复杂的组合逻辑
@@ -86,7 +86,6 @@ def main():
     auc_stack = roc_auc_score(y, stack_preds)
     mcc_stack = matthews_corrcoef(y, stack_preds > 0.5)
 
-    print(f"🤖 Stacking LR 结果:")
     print(f"   ACC: {acc_stack:.4f}")
     print(f"   AUC: {auc_stack:.4f}")
     print(f"   MCC: {mcc_stack:.4f}")

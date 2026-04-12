@@ -6,14 +6,13 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 import config
 
-# 忽略不必要的警告，保持控制台整洁
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.validation")
 
 
 def main():
     print(">>> [1/3] 加载基础特征 (ProtT5 + Phys + CKSAAP)...")
     if not os.path.exists(config.FEATURE_CACHE):
-        print(f"❌ 错误: 未找到基础特征文件 {config.FEATURE_CACHE}，请先运行 extract_features.py")
+        print(f"× 错误: 未找到基础特征文件 {config.FEATURE_CACHE}，请先运行 extract_features.py")
         return
 
     data_base = np.load(config.FEATURE_CACHE, allow_pickle=True)
@@ -23,15 +22,15 @@ def main():
     print(">>> [2/3] 加载大模型特征 (ESM-2 3B)...")
     esm_file = os.path.join(config.CACHE_DIR, "esm2_3b_features_AIP.npz")
     if not os.path.exists(esm_file):
-        print(f"❌ 错误：未找到 ESM-2 特征文件 {esm_file}，请先运行 extract_esm2_3b.py")
+        print(f"× 错误：未找到 ESM-2 特征文件 {esm_file}，请先运行 extract_esm2_3b.py")
         return
 
     data_esm = np.load(esm_file, allow_pickle=True)
     X_esm = data_esm["X"]
 
-    # 1. 优化: 简单校验样本数是否对齐，防止拼接错位
+    # 简单校验样本数是否对齐，防止拼接错位
     if len(X_base) != len(X_esm):
-        print("❌ 错误: 基础特征与 ESM-2 特征样本数量不一致，请检查！")
+        print("× 错误: 基础特征与 ESM-2 特征样本数量不一致，请检查！")
         return
 
     print(">>> [3/3] 执行特征级拼接 (Feature Concat)...")
@@ -41,7 +40,6 @@ def main():
     # --- 特征筛选 ---
     print(">>> 正在基于 LightGBM 筛选 Top 300 核心特征...")
 
-    # 2. 优化: 增加 verbosity=-1 防止刷屏，n_jobs=-1 拉满 CPU 多核加速
     selector = LGBMClassifier(n_estimators=100, random_state=42, verbosity=-1, n_jobs=-1)
     selector.fit(X_final, y)
 
@@ -52,7 +50,6 @@ def main():
     # --- 交叉验证与预测 ---
     oof_probs = np.zeros(len(y))
 
-    # 3. 优化: 将散落的参数统一更新到 params 字典中，并显式锁定 random_state
     params = config.LGBM_PARAMS.copy()
     params.update({
         'num_leaves': 128,
@@ -82,14 +79,13 @@ def main():
         print(f"   Fold {fold + 1}: ACC = {fold_acc:.4f}, AUC = {fold_auc:.4f}")
 
     print("=" * 40)
-    print(f"🏆 Old-Model (Dual-Tower) 平均 ACC: {np.mean(accs):.4f}")
-    print(f"🏆 Old-Model (Dual-Tower) 平均 AUC: {np.mean(aucs):.4f}")
+    print(f"Dual-Tower 平均 ACC: {np.mean(accs):.4f}")
+    print(f"Dual-Tower 平均 AUC: {np.mean(aucs):.4f}")
     print("=" * 40)
 
-    # 4. 优化: 结果原样保存，保证上层 fusion.py 能够无缝读取
-    save_path = "preds_old_model_AIP.npz"
+    save_path = "preds_dual_tower_AIP.npz"
     np.savez(save_path, probs=oof_probs, labels=y)
-    print(f"🚀 集成数据已保存至: {save_path}")
+    print(f"√ 集成数据已保存至: {save_path}")
 
 if __name__ == "__main__":
     main()

@@ -76,13 +76,13 @@ def train():
     vocab_size, embed_dim = embedding_matrix.shape
     phys_dim = 8  # 基础7维 + 电荷密度1维
 
-    print(">>> 3. 开始 5-Fold 巅峰捕捉训练 (CT-Net)...")
+    print(">>> 3. 开始 5-Fold 训练 (CT-Net)...")
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.SEED)
 
     oof_preds = np.zeros(len(labels))
     global_max_len = max([len(s) - config.K_MER + 1 for s in seqs])
 
-    # 记录每一折的巅峰指标和阈值
+    # 记录每一折的最佳指标和阈值
     fold_best_thresholds = [0.5] * 5
     final_best_accs = []
     final_best_aucs = []
@@ -103,7 +103,6 @@ def train():
         )
         val_ds = AIPDataset(X_val.tolist(), y_val, vocab, padding_idx, global_max_len, config.K_MER, False)
 
-        # 【修复的 Sampler 逻辑】：保留正负样本权重，并正确包装为 PyTorch Sampler 对象
         sample_weights = [2.0 if label == 1 else 1.0 for label in y_train]
         sampler = WeightedRandomSampler(weights=sample_weights, num_samples=len(train_ds), replacement=True)
 
@@ -119,7 +118,7 @@ def train():
 
         best_acc, best_auc = 0.0, 0.0
         best_thr_at_peak = 0.5
-        best_model_path = f"models/wo_gate_best_model_fold_{fold + 1}.pth"
+        best_model_path = f"models/ct_net_best_model_fold_{fold + 1}.pth"
 
         for epoch in range(config.NUM_EPOCHS):
             model.train()
@@ -160,7 +159,7 @@ def train():
             curr_acc = accuracy_score(all_labels, (np.array(all_probs) > curr_best_thr).astype(int))
             curr_auc = roc_auc_score(all_labels, all_probs)
 
-            # --- 核心锁定逻辑：以 ACC 提升为保存准则 ---
+            # --- 以 ACC 提升为保存准则 ---
             if curr_acc > best_acc:
                 best_acc = curr_acc
                 best_auc = curr_auc
@@ -171,7 +170,7 @@ def train():
                 print(
                     f"Fold {fold + 1} Epoch {epoch + 1} | ACC: {curr_acc:.4f} (Best: {best_acc:.4f}) | AUC: {curr_auc:.4f}")
 
-        # --- 该折主训练结束，加载巅峰权重 ---
+        # --- 该折主训练结束，加载最佳权重 ---
         model.load_state_dict(torch.load(best_model_path))
 
         # 记录每折最终成果
@@ -179,7 +178,7 @@ def train():
         final_best_accs.append(best_acc)
         final_best_aucs.append(best_auc)
 
-        # 生成巅峰 OOF 预测
+        # 生成最佳 OOF 预测
         model.eval()
         fold_probs = []
         with torch.no_grad():
@@ -199,8 +198,8 @@ def train():
     final_acc = accuracy_score(labels, final_binary_preds)
     final_auc = roc_auc_score(labels, oof_preds)
 
-    print(f"\n🚀 利用巅峰数值结果 (ACC优先模式):")
-    print(f"   Avg ACC: {final_acc:.4f} (历史新高)")
+    print(f"\n=> 利用最佳数值结果 (ACC优先模式):")
+    print(f"   Avg ACC: {final_acc:.4f} ")
     print(f"   Avg AUC: {final_auc:.4f}")
     print(f"   每折锁定阈值: {[round(float(i), 4) for i in fold_best_thresholds]}")
 
@@ -212,7 +211,7 @@ def train():
         'thresholds': fold_best_thresholds
     }, "models/train_assets.joblib")
 
-    np.savez("preds_wo_gate_AIP.npz", probs=oof_preds, labels=labels)
+    np.savez("preds_ct_net_AIP.npz", probs=oof_preds, labels=labels)
 
 
 if __name__ == "__main__":

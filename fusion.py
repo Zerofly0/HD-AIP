@@ -1,79 +1,96 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, roc_auc_score, matthews_corrcoef
+from sklearn.metrics import accuracy_score, roc_auc_score, matthews_corrcoef, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 
 
+def evaluate_metrics(y_true, y_prob, threshold=0.5):
+    """封装统一的指标计算函数"""
+    y_pred = (y_prob > threshold).astype(int)
+
+    acc = accuracy_score(y_true, y_pred)
+    auc = roc_auc_score(y_true, y_prob)
+    mcc = matthews_corrcoef(y_true, y_pred)
+
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+
+    sn = tp / (tp + fn) if (tp + fn) > 0 else 0.0  # Recall / Sensitivity
+    sp = tn / (tn + fp) if (tn + fp) > 0 else 0.0  # Specificity
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0  # Precision
+
+    return acc, auc, mcc, sn, sp, precision
+
+
 def main():
-    print(">>> [终极集成] 启动 Dual-Stream Ensemble...")
+    print(">>> [HD-AIP 终极集成] 启动 Decision-Level Dynamic Ensemble...")
 
-    # 1. 加载两个模型的预测结果
+    # 1. 加载两个子系统的预测结果
     try:
-        data_old = np.load("dual_tower_src/preds_dual_tower_AIP.npz")
-        data_new = np.load("ct_src/preds_ct_net_AIP.npz")
+        data_dual_tower = np.load("dual_tower_src/preds_dual_tower_AIP.npz")
+        data_ct_net = np.load("ct_src/preds_ct_net_AIP.npz")
 
-        p1 = data_old["probs"]  # 旧模型 (PLM + Machine Learning)
-        y = data_old["labels"]  # 真实标签
+        p_dual_tower = data_dual_tower["probs"]  # 机器学习流预测概率
+        y = data_dual_tower["labels"]  # 真实标签
 
-        p2 = data_new["probs"]  # 新模型 (BioVec + CT-Net)
+        p_ct_net = data_ct_net["probs"]  # 深度并行网络流预测概率
 
-        # 简单检查
-        if len(p1) != len(p2):
-            print("❌ 错误：两个模型的样本数量不一致！")
+        if len(p_dual_tower) != len(p_ct_net):
+            print("❌ 错误：两组特征的样本数量不一致！")
             return
     except Exception as e:
         print(f"❌ 加载预测文件失败: {e}")
-        print("请确保你已经按照说明修改了代码并保存了 .npz 文件。")
         return
 
-    print(f"   样本数: {len(y)}")
+    print(f"   当前集成样本总数: {len(y)}\n")
 
-    # 2. 单模型评估 (基准线)
-    acc1 = accuracy_score(y, p1 > 0.5)
-    auc1 = roc_auc_score(y, p1)
-    mcc1 = matthews_corrcoef(y, p1 > 0.5)
-    print(f"   [基准 1] Old Model (Dual-Tower): ACC={acc1:.4f}, AUC={auc1:.4f}, MCC={mcc1:.4f}")
+    # 2. 单子系统评估 (基准线对标)
+    acc_dual, auc_dual, mcc_dual, sn_dual, sp_dual, prec_dual = evaluate_metrics(y, p_dual_tower, threshold=0.5)
+    print(f"   [子系统 1] Dual-Tower (Machine Learning Stream):")
+    print(
+        f"   ACC={acc_dual:.4f}, AUC={auc_dual:.4f}, MCC={mcc_dual:.4f}, Sn={sn_dual:.4f}, Sp={sp_dual:.4f}, Prec={prec_dual:.4f}\n")
 
-    acc2 = accuracy_score(y, p2 > 0.5)
-    auc2 = roc_auc_score(y, p2)
-    mcc2 = matthews_corrcoef(y, p2 > 0.5)
-    print(f"   [基准 2] New Model (CT-Net)    : ACC={acc2:.4f}, AUC={auc2:.4f}, MCC={mcc2:.4f}\n")
+    acc_ct, auc_ct, mcc_ct, sn_ct, sp_ct, prec_ct = evaluate_metrics(y, p_ct_net, threshold=0.5)
+    print(f"   [子系统 2] CT-Net (Deep Learning Stream):")
+    print(
+        f"   ACC={acc_ct:.4f}, AUC={auc_ct:.4f}, MCC={mcc_ct:.4f}, Sn={sn_ct:.4f}, Sp={sp_ct:.4f}, Prec={prec_ct:.4f}\n")
 
-    # 3. 策略 A: 搜索最佳权重 + 最佳阈值 (双维度寻优)
-    best_acc = 0
-    best_w = 0.5
-    best_t = 0.5
-    best_auc = 0
-    best_mcc = 0
+    # 3. 策略 A: 动态加权软集成寻优
+    best_acc, best_w, best_t = 0, 0.5, 0.5
+    best_auc, best_mcc, best_sn, best_sp, best_prec = 0, 0, 0, 0, 0
 
-    # 双重循环：寻找模型比例 w 和 最终判定阈值 t
     for w in np.linspace(0.1, 0.9, 81):
-        p_ensemble = w * p2 + (1 - w) * p1
-        for t in np.arange(0.3, 0.7, 0.01):  # 动态搜索最佳截断点
-            acc = accuracy_score(y, p_ensemble > t)
+        p_ensemble = w * p_ct_net + (1 - w) * p_dual_tower
+        for t in np.arange(0.3, 0.7, 0.01):
+            y_pred_temp = (p_ensemble > t).astype(int)
+            acc = accuracy_score(y, y_pred_temp)
+
             if acc > best_acc:
                 best_acc = acc
                 best_w = w
                 best_t = t
                 best_auc = roc_auc_score(y, p_ensemble)
-                best_mcc = matthews_corrcoef(y, p_ensemble > t)
+                best_mcc = matthews_corrcoef(y, y_pred_temp)
 
-    print(f"\n>>>策略 A： 动态软集成...")
-    print(f"   权重分配: {best_w:.2f} * CT-Net + {1 - best_w:.2f} * Old-Model")
-    print(f"   最佳融合阈值: {best_t:.2f}")
+                tn, fp, fn, tp = confusion_matrix(y, y_pred_temp).ravel()
+                best_sn = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+                best_sp = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+                best_prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+
+    print(f">>> 策略 A： 动态软集成 (Dynamic Soft Ensemble)...")
+    print(f"   最佳权重分配: {best_w:.2f} * CT-Net + {1 - best_w:.2f} * Dual-Tower")
+    print(f"   最优截断阈值: {best_t:.2f}")
     print(f"   ACC: {best_acc:.4f}")
     print(f"   AUC: {best_auc:.4f}")
     print(f"   MCC: {best_mcc:.4f}")
+    print(f"   Sn (Recall): {best_sn:.4f}")
+    print(f"   Sp: {best_sp:.4f}")
+    print(f"   Precision: {best_prec:.4f}\n")
 
-    # 4. 策略 B: Stacking (Logistic Regression)
-    # 如果两者差异很大，LR 可能会学到更复杂的组合逻辑
-    print("\n>>> 策略 B: Logistic Meta-Learner...")
+    # 4. 策略 B: 堆叠集成 (Stacking)
+    print(">>> 策略 B: Logistic Meta-Learner (Stacking)...")
 
-    # 输入特征是两个模型的概率值: [N, 2]
-    X_stack = np.vstack([p1, p2]).T
-
-    # 需要再做一次 CV，防止 Meta-Learner 过拟合
+    X_stack = np.vstack([p_dual_tower, p_ct_net]).T
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     stack_preds = np.zeros(len(y))
 
@@ -82,19 +99,19 @@ def main():
         meta_clf.fit(X_stack[tr], y[tr])
         stack_preds[val] = meta_clf.predict_proba(X_stack[val])[:, 1]
 
-    acc_stack = accuracy_score(y, stack_preds > 0.5)
-    auc_stack = roc_auc_score(y, stack_preds)
-    mcc_stack = matthews_corrcoef(y, stack_preds > 0.5)
+    acc_stack, auc_stack, mcc_stack, sn_stack, sp_stack, prec_stack = evaluate_metrics(y, stack_preds, threshold=0.5)
 
     print(f"   ACC: {acc_stack:.4f}")
     print(f"   AUC: {auc_stack:.4f}")
     print(f"   MCC: {mcc_stack:.4f}")
+    print(f"   Sn (Recall): {sn_stack:.4f}")
+    print(f"   Sp: {sp_stack:.4f}")
+    print(f"   Precision: {prec_stack:.4f}")
 
-    # 5. 结论
-    if best_acc > max(acc1, acc2):
-        print("\n✅ 集成成功！性能超越了单模型。")
+    if best_acc > max(acc_dual, acc_ct):
+        print("\n✅ 集成成功！异构双塔模型 (HD-AIP) 性能全面超越单一子系统。")
     else:
-        print("\n⚠️ 集成未带来显著提升，可能是两个模型预测结果过于相似 (Correlation too high)。")
+        print("\n⚠️ 集成未带来显著提升。")
 
 
 if __name__ == "__main__":

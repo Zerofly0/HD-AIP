@@ -27,7 +27,7 @@ def main():
 
     # 1. 加载两个子系统的预测结果
     try:
-        data_dual_tower = np.load("dual_tower_src/preds_dual_tower_AIP.npz")
+        data_dual_tower = np.load("plm_src/preds_plm_AIP.npz")
         data_ct_net = np.load("ct_src/preds_ct_net_AIP.npz")
 
         p_dual_tower = data_dual_tower["probs"]  # 机器学习流预测概率

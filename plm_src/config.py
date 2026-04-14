@@ -22,7 +22,7 @@ N_FOLDS = 5
 LGBM_PARAMS = {
     'n_estimators': 754,
     'learning_rate': 0.015841742665909857,
-    'num_leaves': 93,
+    'num_leaves': 128,
     'max_depth': 14,
     'min_child_samples': 55,
     'subsample': 0.7734469940873437,

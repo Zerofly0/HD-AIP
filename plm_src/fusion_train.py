@@ -83,7 +83,7 @@ def main():
     print(f"Dual-Tower 平均 AUC: {np.mean(aucs):.4f}")
     print("=" * 40)
 
-    save_path = "preds_dual_tower_AIP.npz"
+    save_path = "preds_plm_AIP.npz"
     np.savez(save_path, probs=oof_probs, labels=y)
     print(f"√ 集成数据已保存至: {save_path}")
 

@@ -4,17 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="增加了更多的评估指标：Sn、Sp、Precision">
-      <change afterPath="$PROJECT_DIR$/best_model/preds_ct_net_AIP.npz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/best_model/preds_plm_AIP.npz" afterDir="false" />
+    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="优化了代码格式">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/baseline_ml.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/baseline_ml.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/extract_esm2_3b.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/extract_esm2_3b.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/extract_features.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/extract_features.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/feature_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/feature_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dual_tower_src/fusion_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/fusion_train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fusion.py" beforeDir="false" afterPath="$PROJECT_DIR$/fusion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/plm_src/baseline_ml.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/baseline_ml.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,7 +195,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776012261843</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="优化了代码格式">
+      <option name="closed" value="true" />
+      <created>1776173692753</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1776173692753</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -231,6 +231,7 @@
     <MESSAGE value="对比试验-外部基线对比实验：&#10;对比经典深度学习 (Classic DL)&#10;(CT-AIP_env) F:\pycharm241023\pythonwork\CT-AIP\ct_src&gt;python baseline_dl.py&#10;&gt;&gt;&gt; 准备 BioVec 数据与特征环境...&#10;&gt;&gt;&gt; [BioVec] 开始训练 K-mer Embedding (K=3)...&#10;Exception ignored in: 'gensim.models.word2vec_inner.our_dot_float'&#10;✅ BioVec 模型已保存: F:\pycharm241023\pythonwork\CT-AIP\models\biovec.model&#10;   词表大小: 7037&#10;&#10;==================== 正在训练与评估: TextCNN ====================&#10;   Fold 1: ACC=0.6687, AUC=0.7116, MCC=0.3135&#10;   Fold 2: ACC=0.6818, AUC=0.7230, MCC=0.3424&#10;   Fold 3: ACC=0.7008, AUC=0.7438, MCC=0.3805&#10;   Fold 4: ACC=0.6877, AUC=0.7385, MCC=0.3414&#10;   Fold 5: ACC=0.6838, AUC=0.7401, MCC=0.3476&#10; TextCNN 最终平均结果: ACC=0.6845, AUC=0.7314, MCC=0.3451&#10;&#10;==================== 正在训练与评估: BiLSTM ====================&#10;   Fold 1: ACC=0.6675, AUC=0.6688, MCC=0.2875&#10;   Fold 2: ACC=0.6961, AUC=0.7022, MCC=0.3667&#10;   Fold 3: ACC=0.6913, AUC=0.7162, MCC=0.3385&#10;   Fold 4: ACC=0.6853, AUC=0.7036, MCC=0.3235&#10;   Fold 5: ACC=0.6933, AUC=0.7226, MCC=0.3437&#10; BiLSTM 最终平均结果: ACC=0.6867, AUC=0.7027, MCC=0.3320&#10;&#10;==================== 正在训练与评估: Standard Transformer ====================&#10;   Fold 1: ACC=0.6853, AUC=0.7334, MCC=0.3281&#10;   Fold 2: ACC=0.7163, AUC=0.7559, MCC=0.3956&#10;   Fold 3: ACC=0.7092, AUC=0.7807, MCC=0.3962&#10;   Fold 4: ACC=0.7020, AUC=0.7402, MCC=0.3853&#10;   Fold 5: ACC=0.7088, AUC=0.7571, MCC=0.3887&#10; Standard Transformer 最终平均结果: ACC=0.7043, AUC=0.7535, MCC=0.3788" />
     <MESSAGE value="优化内容" />
     <MESSAGE value="增加了更多的评估指标：Sn、Sp、Precision" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加了更多的评估指标：Sn、Sp、Precision" />
+    <MESSAGE value="优化了代码格式" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化了代码格式" />
   </component>
 </project>

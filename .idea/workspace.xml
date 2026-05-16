@@ -4,22 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="修改了内部消融ml的特征部分">
-      <change afterPath="$PROJECT_DIR$/ct_src/predict_ct_ind.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/BertAIP_test_dataset.fasta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/extract_independent_dataset.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ind_eval.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/plm_src/evaluate_ind.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/CT-AIP.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/HD-AIP.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+    <list default="true" id="15cee964-27e8-4fc5-8191-36a0146c69e4" name="更改" comment="创建了独立测试集并进行独立测试。&#10;补充了README.md文件。">
+      <change afterPath="$PROJECT_DIR$/plot_hd_aip_figures.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ct_src/phy_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/ct_src/phy_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plm_src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plm_src/extract_esm2_3b.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/extract_esm2_3b.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plm_src/extract_features.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/extract_features.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/plm_src/fusion_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/plm_src/fusion_train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +31,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ying-jc/BertAIP.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/Zerofly0/HD-AIP.git&quot;,
     &quot;accountId&quot;: &quot;dcdc8465-0085-4619-a69c-0dfb1c3a22d5&quot;
   }
 }</component>
@@ -57,22 +44,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "F:/pycharm241023/pythonwork/CT-AIP",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;F:/pycharm241023/pythonwork/HD-AIP&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\pycharm241023\pythonwork\HD-AIP" />
       <recent name="F:\pycharm241023\pythonwork\CT-AIP" />
       <recent name="F:\pycharm241023\pythonwork\CT-AIP\best_model" />
       <recent name="F:\pycharm241023\pythonwork\CT-AIP\dual_tower_src" />
       <recent name="F:\pycharm241023\pythonwork\CT-AIP\ct_src" />
-      <recent name="F:\pycharm241023\pythonwork\CT-AIP\data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="F:\pycharm241023\pythonwork\CT-AIP\data" />
@@ -242,7 +229,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776236315066</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="创建了独立测试集并进行独立测试。&#10;补充了README.md文件。">
+      <option name="closed" value="true" />
+      <created>1778937815535</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1778937815535</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -272,6 +267,7 @@
     <MESSAGE value="增加了更多的评估指标：Sn、Sp、Precision" />
     <MESSAGE value="优化了代码格式" />
     <MESSAGE value="修改了内部消融ml的特征部分" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改了内部消融ml的特征部分" />
+    <MESSAGE value="创建了独立测试集并进行独立测试。&#10;补充了README.md文件。" />
+    <option name="LAST_COMMIT_MESSAGE" value="创建了独立测试集并进行独立测试。&#10;补充了README.md文件。" />
   </component>
 </project>

@@ -7,6 +7,7 @@ from transformers import T5Tokenizer, T5EncoderModel
 from sklearn.preprocessing import StandardScaler
 import config
 import feature_utils
+import joblib
 
 def parse_fasta(fp):
     ids, seqs, labels = [], [], []
@@ -78,8 +79,12 @@ def main():
     X_hand = np.array(hand_list)
 
     # 归一化
-    scaler = StandardScaler()
-    X_hand = scaler.fit_transform(X_hand)
+    # scaler = StandardScaler()
+    # X_hand = scaler.fit_transform(X_hand)
+    scaler = joblib.load(os.path.join(config.OUT_DIR, "models", "handcraft_scaler.pkl"))
+    X_hand = scaler.transform(X_hand)
+    os.makedirs(os.path.join(config.OUT_DIR, "models"), exist_ok=True)
+    joblib.dump(scaler, os.path.join(config.OUT_DIR, "models", "handcraft_scaler.pkl"))
 
     # --- 3. 融合 ---
     X_final = np.hstack([X_emb, X_hand])

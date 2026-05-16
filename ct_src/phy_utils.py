@@ -3,7 +3,6 @@ import numpy as np
 
 # 氨基酸理化性质字典 (Residue-Level Features)
 # 顺序: [疏水性, 亲水性, 分子量, 等电点, 极性, 芳香性, 侧链电荷]
-# 数据来源参考: AAindex / Chu et al.
 AA_PROPS = {
     'A': [1.8, -0.5, 89.1, 6.00, 0, 0, 0],
     'R': [-4.5, 3.0, 174.2, 10.76, 1, 0, 1],

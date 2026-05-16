@@ -5,6 +5,7 @@ from lightgbm import LGBMClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 import config
+import joblib
 
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn.utils.validation")
 
@@ -44,6 +45,10 @@ def main():
     selector.fit(X_final, y)
 
     top_indices = np.argsort(selector.feature_importances_)[::-1][:300]
+
+    os.makedirs(os.path.join(config.OUT_DIR, "models"), exist_ok=True)
+    np.save(os.path.join(config.OUT_DIR, "models", "top_300_indices.npy"), top_indices)
+
     X_selected = X_final[:, top_indices]
     print(f"   ✅ 已截取重要性排名前 300 的特征。")
 
@@ -66,6 +71,8 @@ def main():
     for fold, (tr, val) in enumerate(skf.split(X_selected, y)):
         clf = LGBMClassifier(**params)
         clf.fit(X_selected[tr], y[tr])
+
+        joblib.dump(clf, os.path.join(config.OUT_DIR, "models", f"lgbm_fold_{fold}.pkl"))
 
         # 记录验证集的概率
         fold_probs = clf.predict_proba(X_selected[val])[:, 1]

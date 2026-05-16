@@ -7,8 +7,11 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 OUT_DIR = os.path.join(BASE_DIR, "output")
 CACHE_DIR = os.path.join(OUT_DIR, "cache")
 
-FASTA_PATH = os.path.join(DATA_DIR, "AIP.fasta")
-FEATURE_CACHE = os.path.join(CACHE_DIR, "features_AIP.npz")
+# FASTA_PATH = os.path.join(DATA_DIR, "AIP.fasta")
+# FEATURE_CACHE = os.path.join(CACHE_DIR, "features_AIP.npz")
+
+FASTA_PATH = os.path.join(DATA_DIR, "ind_dataset.fasta")
+FEATURE_CACHE = os.path.join(CACHE_DIR, "ind_dataset_features_AIP.npz")
 
 # 模型配置
 PROTT5_MODEL = "Rostlab/prot_t5_xl_half_uniref50-enc"

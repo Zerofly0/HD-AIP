@@ -8,7 +8,7 @@ import config
 # ============ 配置 ============
 # ESM-2 3B 版本 (结构预测 SOTA)
 MODEL_NAME = "facebook/esm2_t36_3B_UR50D"
-CACHE_FILE = os.path.join(config.CACHE_DIR, "esm2_3b_features_AIP.npz")
+CACHE_FILE = os.path.join(config.CACHE_DIR, "ind_dataset_esm2_3b_features_AIP.npz")
 BATCH_SIZE = 1
 # ==============================
 

@@ -1,4 +1,4 @@
-# CT-AIP
+# HD-AIP
 
 This repository contains the experimental code for anti-inflammatory peptide (AIP) identification in a research project. The project includes two prediction branches: a CT-Net deep learning branch and a machine learning branch that combines protein language model representations with handcrafted features. The final prediction can be obtained by decision-level fusion of the probabilities produced by the two branches.
 
@@ -45,6 +45,11 @@ pip install numpy pandas scikit-learn torch transformers tqdm joblib lightgbm ge
 ```
 
 If ProtT5 or ESM-2 3B feature extraction is required, install a PyTorch version compatible with your CUDA environment. Model weights will be downloaded automatically by `transformers` during the first run.
+
+## Dataset Source
+The benchmark dataset was collected from previous anti-inflammatory peptide prediction studies and was originally derived from experimentally validated peptide records in the Immune Epitope Database (IEDB). Positive samples are experimentally validated anti-inflammatory peptides, and negative samples are peptides without anti-inflammatory activity according to the original data annotation.
+The independent test set was constructed from the test data used in the BertAIP study. Exact sequence matches between the independent test set and the training dataset were removed to reduce potential data leakage. The resulting independent test set is provided as data/ind_dataset.fasta.
+The labels in all FASTA files are encoded in the sequence headers, where label=1 denotes an anti-inflammatory peptide and label=0 denotes a non-AIP sequence.
 
 ## Data Format
 
@@ -176,5 +181,4 @@ python fusion.py
 - The paths in `plm_src/config.py` determine which FASTA file is used for feature extraction. Check them carefully when switching between training and independent test data.
 - ESM-2 3B is a large model. A GPU is recommended. If GPU memory is insufficient, reduce `BATCH_SIZE` or reuse cached `.npz` feature files.
 - Existing `.npz`, `.npy`, `.pkl`, and `.pth` files can be used to reproduce results or skip time-consuming steps.
-
 

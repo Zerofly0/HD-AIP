@@ -1,4 +1,4 @@
-# HD-AIP
+# CT-AIP
 
 本项目是用于抗炎肽（Anti-inflammatory Peptides, AIP）识别与预测的实验代码。代码包含两个预测分支：基于 CT-Net 的深度学习分支，以及融合蛋白语言模型表征和手工特征的机器学习分支。最终预测可通过两个分支的概率结果进行决策层融合。
 
@@ -38,7 +38,17 @@ CT-AIP/
 
 ## 环境依赖
 
-建议使用 Python 3.9 或相近版本。运行蛋白语言模型特征提取时建议使用 GPU。
+代码在以下配置下运行：
+
+- Python 3.9.25
+
+- PyTorch 2.0.0（CPU版本）
+
+使用以下命令安装所需依赖：
+```bash
+pip install -r requirements.txt
+```
+进行ProtT5或ESM-2 3B特征提取时，建议安装支持安装CUDA的PyTorch版本。首次运行时，`transformers` 将自动下载模型权重。
 
 ```bash
 pip install numpy pandas scikit-learn torch transformers tqdm joblib lightgbm gensim
@@ -58,12 +68,6 @@ GAGAGAGAGAGA
 ```
 
 其中 `label=1` 表示抗炎肽，`label=0` 表示非抗炎肽。
-
-## 数据来源
-
-基准数据集是从之前的抗炎肽预测研究中收集的，最初来源于免疫表位数据库（IEDB）中经过实验验证的肽记录。正样本是经过实验验证的抗炎肽，负样本是根据原始数据注释没有抗炎活性的肽。
-独立测试集是从BertAIP研究中使用的测试数据构建的。为了减少潜在的数据泄漏，独立测试集与训练数据集之间的完全序列匹配被移除了。生成的独立测试集提供在 data/ind_dataset.fasta。
-所有FASTA文件中的标签都编码在序列标题中，其中label=1表示抗炎肽，label=0表示非AIP序列。
 
 ## 使用已有模型进行独立测试
 

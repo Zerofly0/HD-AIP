@@ -7,7 +7,7 @@ Chinese version: [README_CN.md](README_CN.md)
 ## Project Structure
 
 ```text
-CT-AIP/
+HD-AIP/
 ├── data/                         # Training and independent test datasets
 │   ├── AIP.fasta                  # Main training dataset
 │   ├── BertAIP_test_dataset.fasta # External test data source

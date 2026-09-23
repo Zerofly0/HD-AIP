@@ -1,4 +1,4 @@
-# CT-AIP
+# HD-AIP
 
 本项目是用于抗炎肽（Anti-inflammatory Peptides, AIP）识别与预测的实验代码。代码包含两个预测分支：基于 CT-Net 的深度学习分支，以及融合蛋白语言模型表征和手工特征的机器学习分支。最终预测可通过两个分支的概率结果进行决策层融合。
 
@@ -7,7 +7,7 @@ English version: [README.md](README.md)
 ## 项目结构
 
 ```text
-CT-AIP/
+HD-AIP/
 ├── data/                         # 训练集和独立测试集
 │   ├── AIP.fasta                  # 主训练数据
 │   ├── BertAIP_test_dataset.fasta # 外部测试数据来源

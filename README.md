@@ -1,4 +1,4 @@
-# CT-AIP
+# HD-AIP
 
 This repository contains the experimental code for anti-inflammatory peptide (AIP) identification in a research project. The project includes two prediction branches: a CT-Net deep learning branch and a machine learning branch that combines protein language model representations with handcrafted features. The final prediction can be obtained by decision-level fusion of the probabilities produced by the two branches.
 
